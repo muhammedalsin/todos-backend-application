@@ -44,17 +44,28 @@ app.put("/toggle/:id", async (req, res) => {
 
 // Edit todo
 app.put("/edit/:id", async (req, res) => {
-  const todo = await Todo.findByIdAndUpdate(
-    req.params.id,
-    {
-      text: req.body.text,
-      paragraph: req.body.paragraph,
-    },
-    { new: true }
-  );
-  
+  try {
+    const { text, paragraph } = req.body;
 
-  res.json(todo);
+    if (!text || !paragraph) {
+      return res.status(400).json({ error: "Text and paragraph are required" });
+    }
+
+    const todo = await Todo.findByIdAndUpdate(
+      req.params.id,
+      { text, paragraph },
+      { new: true, runValidators: true }
+    );
+
+    if (!todo) {
+      return res.status(404).json({ error: "Todo not found" });
+    }
+
+    res.json({ message: "Todo updated successfully", todo });
+  } catch (err) {
+    console.error("Edit error:", err);
+    res.status(500).json({ error: "Server error while updating todo" });
+  }
 });
 
 // Delete todo
