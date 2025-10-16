@@ -42,6 +42,20 @@ app.put("/toggle/:id", async (req, res) => {
   res.json(todo);
 });
 
+// Edit todo
+app.put("/edit/:id", async (req, res) => {
+  const todo = await Todo.findByIdAndUpdate(
+    req.params.id,
+    {
+      text: req.body.text,
+      paragraph: req.body.paragraph,
+    },
+    { new: true }
+  );
+
+  res.json(todo);
+});
+
 // Delete todo
 app.delete("/delete/:id", async (req, res) => {
   await Todo.findByIdAndDelete(req.params.id);
